@@ -1,37 +1,54 @@
-![Driver Drowsiness Detection](https://firebasestorage.googleapis.com/v0/b/neelanjan-manna.appspot.com/o/project-images%2FDrowsiness%20Detection.jpeg?alt=media&token=74c92bdd-0beb-4543-b7af-c0fabc9326d5)
-<h1 align="center">Welcome to Driver Drowsiness Detector 👋</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0-blue.svg?cacheSeconds=2592000" />
-  <a href="https://twitter.com/NeelanjanManna" target="_blank">
-    <img alt="Twitter: NeelanjanManna" src="https://img.shields.io/twitter/follow/NeelanjanManna.svg?style=social" />
-  </a>
-</p>
+# Driver Drowsiness Detection
 
-> A real-time drowsiness detection system for drivers, which alerts the driver if they fall asleep due to fatigue while still driving. The computer vision algorithm used for the implementation uses a trifold approach to detect drowsiness, including the measurement of forward head tilt angle, measurement of eye aspect ratio (to detect closure of eyes) and measurement of mouth aspect ratio (to detect yawning).
+A real-time computer vision system that monitors a driver's face through a webcam and detects signs of drowsiness using three complementary methods: eye closure (EAR), yawning (MAR), and head-tilt estimation. Triggers an audio alarm when fatigue is detected.
 
-### 🏠 [Homepage](https://github.com/neelanjan00/Driver-Drowsiness-Detection)
+## Tech Stack
 
-## Install
+| | |
+|---|---|
+| Language | Python |
+| Vision | OpenCV, dlib (68-point facial landmarks) |
+| Math | NumPy, SciPy, imutils |
+| Audio | playsound |
 
-```sh
+## Features
+
+- **Eye Aspect Ratio (EAR)** — Detects eye closure; triggers DROWSINESS alert if eyes are closed for consecutive frames
+- **Mouth Aspect Ratio (MAR)** — Detects yawning when MAR exceeds threshold
+- **Head Pose Estimation** — Measures forward head tilt using Perspective-n-Point (PnP) solve
+- **Real-Time Display** — Bounding boxes, facial landmarks, status panel with EAR/MAR/Head Tilt values
+- **Audio Alarm** — Plays `alarm.mp3` via background thread when drowsiness is detected
+- **Auto Camera Detection** — Tries camera indices 0, 1, 2 automatically
+
+## Quick Start
+
+```bash
+# Install dependencies
 pip install -r Requirements.txt
+
+# Run the detection
+python ddd.py
 ```
 
-## Usage
+Press **`q`** to quit the application.
 
-```sh
-python Driver\ Drowsiness\ Detection.py
-```
+## How It Works
 
-## Author
+| Component | File | Method |
+|---|---|---|
+| Eye Closure | `EAR.py` | Ratio of vertical to horizontal eye landmark distances (< 0.25 = closed) |
+| Yawning | `MAR.py` | Ratio of vertical to horizontal mouth landmark distances (> 0.79 = yawning) |
+| Head Tilt | `HeadPose.py` | 3D face model + solvePnP to estimate forward tilt angle |
+| Main Loop | `ddd.py` | Webcam capture, face detection, metric computation, alarm trigger |
 
-👤 **Neelanjan Manna**
+## Parameters
 
-* Website: https://neelanjanmanna.ml/
-* Twitter: [@NeelanjanManna](https://twitter.com/NeelanjanManna)
-* Github: [@neelanjan00](https://github.com/neelanjan00)
-* LinkedIn: [@neelanjan00](https://linkedin.com/in/neelanjan00)
+| Parameter | Threshold | Consecutive Frames |
+|---|---|---|
+| EAR (Eye Closure) | < 0.25 | 3+ frames |
+| MAR (Yawning) | > 0.79 | Instant |
+| Head Tilt | Forward tilt angle | Instant |
 
-## Show your support
+## Model
 
-Give a ⭐️ if this project helped you!
+The system uses dlib's pre-trained **68-point facial landmark predictor** (`shape_predictor_68_face_landmarks.dat`) based on the iBUG 300-W dataset.
